@@ -20,7 +20,7 @@ function order(){
     connection.query("SELECT * FROM products", function(err, res){
         if (err) throw err;
         for(let i=0; i<res.length; i++){
-            prodArr.push(res[i].product_name);
+            prodArr.push(res[i].id + ' | ' + res[i].product_name + ' | ' + res[i].price);
         }
         promptToBuy();
     });
@@ -32,7 +32,7 @@ function promptToBuy(){
         {
         message: "Select the product you'd like to order",
         name: "product",
-        type: "rawlist",
+        type: "list",
         choices: prodArr
         },
         {
@@ -45,8 +45,50 @@ function promptToBuy(){
             return false;
         }
         }
-    ]).then(function(res){ //NEEDS TO BE FIXED
-        var availableQty = connection.query("SELECT FROM products WHERE ID ?", [res.product]);
-        console.log(availableQty);
+    ]).then(function(res){
+        var productChosen = parseInt(res.product.split('|')[0].trim());
+        connection.query("SELECT * FROM products WHERE ID=?", [productChosen], function(err, results){
+            if(err) throw err;
+            var availableQuantity = results[0].stock_quantity;
+            if(availableQuantity >= res.quantity){
+                let newQuantity = availableQuantity - res.quantity;
+                let total = res.quantity * results[0].price;
+                orderSuccess(productChosen, newQuantity, total);
+            }
+            else{
+                console.log("INSUFFICIENT QUANTITY");
+                orderAgain();
+            }
+        });
     });
+}
+
+function orderSuccess(id, qty, total){
+    connection.query("UPDATE products SET ? WHERE ?",
+    [
+      {
+        stock_quantity: qty
+      },
+      {
+        id: id
+      }
+    ], function(err, res){
+        console.log("Your order is complete!");
+        console.log("Your total is " + total);
+        orderAgain();
+    });
+}
+
+function orderAgain(){
+    inquirer.prompt([
+        {
+            message: "Place another order?",
+            name: "orderAgain",
+            type: "list",
+            choices: ["Yes", "No"]
+        }
+    ]).then(function(res){
+        if(res.orderAgain == "Yes") order();
+        else {connection.end()};
+    })
 }

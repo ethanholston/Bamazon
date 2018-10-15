@@ -9,6 +9,7 @@ CREATE TABLE products(
     product_name VARCHAR(50),
     department_name VARCHAR(50),
     stock_quantity INT,
+    price DECIMAL(11,2),
     PRIMARY KEY(id)
 );
 
