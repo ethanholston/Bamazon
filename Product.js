@@ -6,3 +6,5 @@ class AddProduct{
         this.stock_quantity = stock
     }
 }
+
+module.exports = AddProduct;

@@ -20,7 +20,7 @@ function order(){
     connection.query("SELECT * FROM products", function(err, res){
         if (err) throw err;
         for(let i=0; i<res.length; i++){
-            prodArr.push(res[i].id + ' | ' + res[i].product_name + ' | ' + res[i].price);
+            prodArr.push(res[i].id + ' | Name: ' + res[i].product_name + ' | Price: ' + res[i].price + ' | Stock Qty: ' + res[i].stock_quantity);
         }
         promptToBuy();
     });
