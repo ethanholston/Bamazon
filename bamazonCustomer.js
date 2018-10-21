@@ -50,11 +50,11 @@ function promptToBuy(){
         var productChosen = parseInt(res.product.split('|')[0].trim());
         connection.query("SELECT * FROM products WHERE ID=?", [productChosen], function(err, results){
             if(err) throw err;
-            if(results[0].total_profit == null){
+            if(results[0].product_sales == null){
                  var totalProfit = 0;
             }
             else {
-                var totalProfit = parseFloat(results[0].total_profit);
+                var totalProfit = parseFloat(results[0].product_sales);
             };
             var availableQuantity = results[0].stock_quantity;
             if(availableQuantity >= res.quantity){
@@ -72,11 +72,11 @@ function promptToBuy(){
 }
 
 function orderSuccess(id, qty, total, profit){
-    connection.query("UPDATE products SET stock_quantity = ?, total_profit = ? WHERE id = ?",
+    connection.query("UPDATE products SET stock_quantity = ?, product_sales = ? WHERE id = ?",
     [qty, profit, id], function(err, res){
         if(err) throw err;
         console.log("Your order is complete!");
-        console.log("Your total is " + total);
+        console.log("Your total is " + total.toFixed(2));
         orderAgain();
     });
 }
