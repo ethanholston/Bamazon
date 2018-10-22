@@ -45,11 +45,9 @@ function viewSales(){
         name: "chosenDept"
       }
     ]).then(function(res){
-      connection.query("SELECT departments.department_id, departments.department_name, departments.over_head_costs", [res.chosenDept], function(err, query){
+      connection.query("SELECT * FROM departments WHERE department_name=?", [res.chosenDept], function(err, query){
         var productSales=0;
         connection.query("SELECT * FROM products WHERE department_name=?", [res.chosenDept], function(err, query2){
-          console.log(query);
-          console.log(query2);
           if(err) throw err;          
           for(let i=0; i<query2.length; i++){
             if(query2[i].product_sales){
