@@ -71,3 +71,55 @@ function viewSales(){
     });
   });
 }
+
+function makeDept(){
+  inquirer.prompt([
+    {
+      message: "What is the name of the department?",
+      name: "deptName"
+    },
+    {
+      message: "What are the overhead costs for this department?",
+      name: "overhead"
+    }
+  ]).then(function(res){
+    connection.query("SELECT * FROM departments WHERE department_name=?", [res.deptName], function(err, result){
+      if(err) throw err;
+      if(result.length > 0){
+        console.log("Department already exists"); 
+        again();
+      }
+      else {
+        connection.query("INSERT INTO departments SET ?", 
+          [
+            {
+              department_name: res.deptName,
+              over_head_costs: res.overhead
+            }
+          ], function(err){
+          if(err) throw err;
+          console.log(res.deptName + " has been added");
+          again();
+        });
+      }
+    });
+  });
+}
+
+function again(){
+  inquirer.prompt([
+    {
+      message: "Do you want to do anything else?",
+      name: "again",
+      type: "list",
+      choices: ["Yes", "No"]
+    }
+  ]).then(function(res){
+    if(res.again == "Yes"){
+      listCommands();
+    }
+    else{
+      connection.end();
+    }
+  });
+}
