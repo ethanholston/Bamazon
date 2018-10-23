@@ -31,44 +31,28 @@ function listCommands(){
 }
 
 function viewSales(){
-  var deptArr = [];
-  connection.query("SELECT * FROM departments", function(err, res){
-    if(err) throw err;
-    for(let i=0; i<res.length; i++){
-      deptArr.push(res[i].department_name);
-    }
-    inquirer.prompt([
-      {
-        message: "What department would you like to view sales for?",
-        choices: deptArr,
-        type: "list",
-        name: "chosenDept"
-      }
-    ]).then(function(res){
-      connection.query("SELECT * FROM departments WHERE department_name=?", [res.chosenDept], function(err, query){
-        var productSales=0;
-        connection.query("SELECT * FROM products WHERE department_name=?", [res.chosenDept], function(err, query2){
-          if(err) throw err;          
-          for(let i=0; i<query2.length; i++){
-            if(query2[i].product_sales){
-              productSales += parseFloat(query2[i].product_sales.toFixed(2));
-            }
-          }
-          console.log("Product sales " + productSales);
-          var totalProfit = productSales - parseFloat(query[0].over_head_costs.toFixed(2));
-          var data = [
-            {
-              id: query[0].department_id,
-              name: query[0].department_name,
-              overhead_costs: query[0].over_head_costs,
-              product_sales: productSales,
-              total_profit: totalProfit
-            }
-          ]
-          console.table(data);
-        })
+  function Dept(id, name, overhead, sales, profit){
+    this.department_id = id,
+    this.department_name = name,
+    this.overhead = overhead,
+    this.dept_sales = sales,
+    this.total_profit = profit
+  };
+  connection.query("SELECT * FROM departments", function(err, query){
+    var deptArr = []
+    for(let i=0; i<query.length; i++){
+      var curDept = query[i].department_name;
+      connection.query("SELECT SUM(product_sales) as 'total_sales' FROM products WHERE department_name=?", [curDept], function(err, query2){
+      let totalSales;
+      if(query2[0].total_sales == null) totalSales = 0;
+      else{totalSales = parseFloat(query2[0].total_sales.toFixed(2))}
+      let totalProfit = totalSales - parseFloat(query[i].over_head_costs.toFixed(2));
+      let newDept = new Dept(query[i].department_id, query[i].department_name, query[i].over_head_costs, totalSales, totalProfit);
+      deptArr.push(newDept);
+      console.table(deptArr);
+      again();
       });
-    });
+    }
   });
 }
 
@@ -123,3 +107,4 @@ function again(){
     }
   });
 }
+

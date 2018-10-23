@@ -123,14 +123,25 @@ function addInv(){
 };
 
 function addProduct(){
+  var deptArr = [];
+  connection.query("SELECT department_name FROM departments", function(err, res){
+    for (let i=0; i<res.length; i++){
+      deptArr.push(res[i].department_name);
+    }
     inquirer.prompt([
         {
             message: "What is the name of the product you want to add?",
-            name: "name"
+            name: "name",
+            validate: function(input){
+              if(input) return true;
+              return false;
+            }
         },
         {
             message: "What department is the product in?",
-            name: "dept"
+            name: "dept",
+            type: "list",
+            choices: deptArr
         },
         {
             message: "What is the price of the product?",
@@ -160,6 +171,7 @@ function addProduct(){
             goAgain();
         });
     });
+  });
 };
 
 function goAgain(){
