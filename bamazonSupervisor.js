@@ -47,7 +47,8 @@ function viewSales(){
       if(query2[0].total_sales == null) totalSales = 0;
       else{totalSales = parseFloat(query2[0].total_sales.toFixed(2))}
       let totalProfit = totalSales - parseFloat(query[i].over_head_costs.toFixed(2));
-      let newDept = new Dept(query[i].department_id, query[i].department_name, query[i].over_head_costs, totalSales, totalProfit);
+      totalProfit = totalProfit.toFixed(2);
+      let newDept = new Dept(query[i].department_id, query[i].department_name, query[i].over_head_costs, totalSales.toFixed(2), totalProfit);
       deptArr.push(newDept);
       if(i==query.length-1){
         console.table(deptArr);
