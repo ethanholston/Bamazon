@@ -49,10 +49,15 @@ function viewSales(){
       let totalProfit = totalSales - parseFloat(query[i].over_head_costs.toFixed(2));
       let newDept = new Dept(query[i].department_id, query[i].department_name, query[i].over_head_costs, totalSales, totalProfit);
       deptArr.push(newDept);
-      console.table(deptArr);
-      again();
+      if(i==query.length-1){
+        console.table(deptArr);
+        again();
+      }
       });
+      
     }
+    // console.table(deptArr);
+    // again();
   });
 }
 
